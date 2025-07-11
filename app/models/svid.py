@@ -1,0 +1,35 @@
+from sqlalchemy import Column, Integer, String, Date, ForeignKey
+from app.database import Base
+
+class Svid(Base):
+    __tablename__ = "svid"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nsvid = Column(Integer)
+    dsvid = Column(Date)
+    fd = Column(String(20))
+    fd_date = Column(Date)
+    company = Column(String(50))
+    company_address = Column(String(50))
+    company_grad = Column(String(30))
+    bulstat = Column(String(13))
+    obekt = Column(String(30))
+    obekt_address = Column(String(50))
+    obekt_grad = Column(String(30))
+    mol = Column(String(50))
+    fp = Column(String(10))
+    dogno = Column(Integer)
+    kasa_no = Column(String(20))
+    dot = Column(Date)
+    ddo = Column(Date)
+    company_tel = Column(String(30))
+    cmodel = Column(String(30))
+    reshenie = Column(String(30))
+    rdate = Column(Date)
+    dog_id = Column(Integer, ForeignKey("dogovor.id"), nullable=True)
+    nfirma = Column(Integer, ForeignKey("org.id"), nullable=True)
+    czu = Column(String(20), nullable=True)
+    benz = Column(String(20), nullable=True)
+    deinost = Column(String(30), nullable=True)
+    isegn1 = Column(Integer)
+    niz = Column(String(40))
