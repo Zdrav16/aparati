@@ -5,7 +5,7 @@ from app.crud.org import get_org, get_orgs, create_org
 from app.database import get_db
 from typing import List
 
-router = APIRouter(prefix="/orgs", tags=["orgs"])
+router = APIRouter(prefix="/org", tags=["org"])
 
 @router.get("/", response_model=List[OrgOut])
 def read_orgs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):

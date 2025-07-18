@@ -1,22 +1,36 @@
 from pydantic import BaseModel
+from typing import Optional
 
-class AparatiBase(BaseModel):
-    kasa_no: str | None = None
-    fp: str | None = None
-    nmodel: int | None = None
-    cobekt: str | None = None
-    address: str | None = None
-    ntown: int | None = None
-    telefon: str | None = None
-    aparat_imsi: str | None = None
-    aparat_tel: str | None = None
-    norg: int | None = None
-    dn: str | None = None
+class AparatBase(BaseModel):
+    kasa_no: Optional[str] = None
+    fp: Optional[str] = None
+    nmodel: Optional[int] = None
+    cobekt: Optional[str] = None
+    address: Optional[str] = None
+    ntown: Optional[int] = None
+    telefon: Optional[str] = None
+    aparat_imsi: Optional[str] = None
+    aparat_tel: Optional[str] = None
+    norg: Optional[int] = None
+    dn: Optional[str] = None
 
-class AparatiCreate(AparatiBase):
+class AparatCreate(AparatBase):
     pass
 
-class AparatiOut(AparatiBase):
+class AparatOut(AparatBase):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+class AparatUpdate(BaseModel):
+    kasa_no: Optional[str] = None
+    fp: Optional[str] = None
+    nmodel: Optional[int] = None
+    cobekt: Optional[str] = None
+    address: Optional[str] = None
+    ntown: Optional[int] = None
+    telefon: Optional[str] = None
+    aparat_imsi: Optional[str] = None
+    aparat_tel: Optional[str] = None
+    norg: Optional[int] = None
+    dn: Optional[str] = None
