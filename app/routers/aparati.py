@@ -1,29 +1,41 @@
-# app/routers/org.py
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
 from app.database import get_db
-from app.schemas.org import OrgCreate, OrgOut
-from app.crud import org as crud_org
+from app.schemas.aparati import AparatCreate, AparatOut, AparatUpdate
+from app.crud import aparati as crud_aparati
 
 router = APIRouter(
-    prefix="/orgs",
-    tags=["Организации"]
+    prefix="/aparati",
+    tags=["Апаратите"]
 )
 
-@router.get("/", response_model=List[OrgOut])
-def get_all_orgs(db: Session = Depends(get_db)):
-    return crud_org.get_orgs(db)
+@router.get("/", response_model=List[AparatOut])
+def get_all_aparati(db: Session = Depends(get_db)):
+    return crud_aparati.get_all_aparati(db)
 
-@router.get("/{org_id}", response_model=OrgOut)
-def get_org(org_id: int, db: Session = Depends(get_db)):
-    org = crud_org.get_org(db, org_id)
-    if not org:
-        raise HTTPException(status_code=404, detail="Организацията не е намерена.")
-    return org
+@router.get("/{aparat_id}", response_model=AparatOut)
+def get_aparat(aparat_id: int, db: Session = Depends(get_db)):
+    aparat = crud_aparati.get_aparat_by_id(db, aparat_id)
+    if not aparat:
+        raise HTTPException(status_code=404, detail="Апаратът не е намерен.")
+    return aparat
 
-@router.post("/", response_model=OrgOut)
-def create_org_view(data: OrgCreate, db: Session = Depends(get_db)):
-    return crud_org.create_org(db, data)
+@router.post("/", response_model=AparatOut)
+def create_aparat(data: AparatCreate, db: Session = Depends(get_db)):
+    return crud_aparati.create_aparat(db, data)
+
+@router.put("/{aparat_id}", response_model=AparatOut)
+def update_aparat(aparat_id: int, data: AparatUpdate, db: Session = Depends(get_db)):
+    updated = crud_aparati.update_aparat(db, aparat_id, data)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Апаратът не е намерен за редакция.")
+    return updated
+
+@router.delete("/{aparat_id}")
+def delete_aparat(aparat_id: int, db: Session = Depends(get_db)):
+    deleted = crud_aparati.delete_aparat(db, aparat_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Апаратът не съществува.")
+    return {"detail": "Апаратът е изтрит успешно."}
