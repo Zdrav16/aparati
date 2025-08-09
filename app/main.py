@@ -5,7 +5,7 @@ from app.database import engine, Base
 
 from app.routers import (
     aparati, org, dogovor, svid, demontaj,
-    model, town, tehnik, tdd
+    model, town, tehnik, tdd, search
 )
 
 app = FastAPI(title="Aparati Management API")
@@ -29,6 +29,7 @@ app.include_router(model.router)
 app.include_router(town.router)
 app.include_router(tehnik.router)
 app.include_router(tdd.router)
+app.include_router(search.router)
 
 @app.on_event("startup")
 def startup_event():
