@@ -39,3 +39,36 @@ def get_expiring_contracts(db: Session, date_from: date, date_to: date):
         Dogovor.ddo <= date_to,
         Dogovor.isprekrat == 0
     ).all()
+
+def extend_dogovor(db: Session, dog_id: int, new_dot: date, new_ddo: date):
+    existing = db.query(Dogovor).filter(Dogovor.id == dog_id).first()
+    if not existing:
+        return None
+    
+    # Генериране на нов номер на договор (може да се промени по твоя логика)
+    new_dog_no = db.query(Dogovor).order_by(Dogovor.dog_no.desc()).first()
+    new_dog_no = (new_dog_no.dog_no + 1) if new_dog_no else 1
+
+    new_dogovor = Dogovor(
+        dog_no=new_dog_no,
+        kasa_no=existing.kasa_no,
+        nfirma=existing.nfirma,
+        dot=new_dot,
+        ddo=new_ddo,
+        price=existing.price,
+        company=existing.company,
+        bulstat=existing.bulstat,
+        company_address=existing.company_address,
+        company_grad=existing.company_grad,
+        obekt=existing.obekt,
+        obekt_address=existing.obekt_address,
+        obekt_grad=existing.obekt_grad,
+        company_tel=existing.company_tel,
+        company_mol=existing.company_mol,
+        fp=existing.fp,
+        isprekrat=0
+    )
+    db.add(new_dogovor)
+    db.commit()
+    db.refresh(new_dogovor)
+    return new_dogovor

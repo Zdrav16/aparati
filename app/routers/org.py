@@ -4,6 +4,7 @@ from app.schemas.org import OrgBase, OrgCreate, OrgOut
 from app.crud.org import get_org, get_orgs, create_org, update_org, delete_org  # <-- Добавено
 from app.database import get_db
 from typing import List
+from app.schemas.org import OrgCreate, OrgUpdate, OrgOut
 
 router = APIRouter(prefix="/org", tags=["Организации"])
 
@@ -22,8 +23,9 @@ def read_org(org_id: int, db: Session = Depends(get_db)):
 def create_new_org(org: OrgCreate, db: Session = Depends(get_db)):
     return create_org(db, org)
 
+
 @router.put("/{org_id}", response_model=OrgOut)
-def update_existing_org(org_id: int, org: OrgCreate, db: Session = Depends(get_db)):
+def update_existing_org(org_id: int, org: OrgUpdate, db: Session = Depends(get_db)):
     updated = update_org(db, org_id, org)
     if not updated:
         raise HTTPException(status_code=404, detail="Org not found for update")

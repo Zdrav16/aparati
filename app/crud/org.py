@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.org import Org
 from app.schemas.org import OrgCreate
+from app.schemas.org import OrgCreate, OrgUpdate
 
 def get_org(db: Session, org_id: int):
     return db.query(Org).filter(Org.id == org_id).first()
@@ -22,7 +23,7 @@ def delete_org(db: Session, org_id: int):
         db.commit()
     return db_org
 
-def update_org(db: Session, org_id: int, org: OrgCreate):
+def update_org(db: Session, org_id: int, org: OrgUpdate):
     db_org = db.query(Org).filter(Org.id == org_id).first()
     if db_org:
         for key, value in org.dict().items():

@@ -24,6 +24,7 @@ def get_svid(svid_id: int, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=SvidOut)
 def create_svid(data: SvidCreate, db: Session = Depends(get_db)):
+    # тук fd се попълва ръчно
     return crud.create_svid(db, data)
 
 @router.put("/{svid_id}", response_model=SvidOut)

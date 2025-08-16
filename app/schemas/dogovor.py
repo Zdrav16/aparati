@@ -34,3 +34,16 @@ class DogovorOut(DogovorBase):
 
     class Config:
         orm_mode = True
+
+# 🔹 нова схема за справка
+class DogovorReportOut(BaseModel):
+    firma_name: str
+    bulstat: str
+    tel: Optional[str] = None
+    ddo: date
+    kasa_no: str
+    fdrid: Optional[str] = None
+    model: Optional[str] = None
+
+    class Config:
+        orm_mode = True

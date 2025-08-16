@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
+from pydantic import BaseModel
 from datetime import date
 
 from app.database import get_db
@@ -12,13 +13,17 @@ router = APIRouter(
     tags=["Договори"]
 )
 
+class ExtendDogovorIn(BaseModel):
+    new_dot: date
+    new_ddo: date
+
 @router.get("/", response_model=List[DogovorOut])
 def list_dogovori(db: Session = Depends(get_db)):
     return crud.get_all_dogovori(db)
 
-@router.get("/{dogovor_id}", response_model=DogovorOut)
-def get_dogovor(dogovor_id: int, db: Session = Depends(get_db)):
-    record = crud.get_dogovor_by_id(db, dogovor_id)
+@router.get("/{dog_id}", response_model=DogovorOut)
+def get_dogovor(dog_id: int, db: Session = Depends(get_db)):
+    record = crud.get_dogovor_by_id(db, dog_id)
     if not record:
         raise HTTPException(status_code=404, detail="Договорът не е намерен.")
     return record
@@ -27,24 +32,23 @@ def get_dogovor(dogovor_id: int, db: Session = Depends(get_db)):
 def create_dogovor(data: DogovorCreate, db: Session = Depends(get_db)):
     return crud.create_dogovor(db, data)
 
-@router.put("/{dogovor_id}", response_model=DogovorOut)
-def update_dogovor(dogovor_id: int, data: DogovorUpdate, db: Session = Depends(get_db)):
-    updated = crud.update_dogovor(db, dogovor_id, data)
+@router.put("/{dog_id}", response_model=DogovorOut)
+def update_dogovor(dog_id: int, data: DogovorUpdate, db: Session = Depends(get_db)):
+    updated = crud.update_dogovor(db, dog_id, data)
     if not updated:
         raise HTTPException(status_code=404, detail="Договорът не е намерен.")
     return updated
 
-@router.delete("/{dogovor_id}")
-def delete_dogovor(dogovor_id: int, db: Session = Depends(get_db)):
-    deleted = crud.delete_dogovor(db, dogovor_id)
+@router.delete("/{dog_id}")
+def delete_dogovor(dog_id: int, db: Session = Depends(get_db)):
+    deleted = crud.delete_dogovor(db, dog_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Договорът не съществува.")
     return {"detail": "Договорът е изтрит успешно."}
 
-@router.get("/expiring/", response_model=List[DogovorOut])
-def get_expiring_dogovori(
-    from_date: date = Query(..., description="Начална дата"),
-    to_date: date = Query(..., description="Крайна дата"),
-    db: Session = Depends(get_db)
-):
-    return crud.get_expiring_contracts(db, from_date, to_date)
+@router.post("/extend/{dog_id}", response_model=DogovorOut)
+def extend_dogovor_endpoint(dog_id: int, data: ExtendDogovorIn, db: Session = Depends(get_db)):
+    new_dog = crud.extend_dogovor(db, dog_id, new_dot=data.new_dot, new_ddo=data.new_ddo)
+    if not new_dog:
+        raise HTTPException(status_code=404, detail="Договорът не е намерен.")
+    return new_dog

@@ -1,25 +1,47 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from app.database import get_db
 from app.models.aparati import Aparat
 from app.models.org import Org
 from app.models.dogovor import Dogovor
-from app.models.svid import Svid
 
 router = APIRouter(prefix="/aparati", tags=["Апаратите"])
 
-@router.get("/{aparat_id}/details")
-def get_aparat_details(aparat_id: int, db: Session = Depends(get_db)):
-    aparat = db.query(Aparat).filter(Aparat.id == aparat_id).first()
+@router.get("/details")
+def get_aparat_details(
+    search_by: str,
+    value: str,
+    db: Session = Depends(get_db)
+):
+    # Подготовка на заявката
+    query = db.query(Aparat)
+
+    if search_by == "id":
+        query = query.filter(Aparat.id == int(value))
+    elif search_by == "kasa_no":
+        query = query.filter(Aparat.kasa_no == value)
+    elif search_by == "fp":
+        query = query.filter(Aparat.fp == value)
+    else:
+        raise HTTPException(status_code=400, detail="Невалиден критерий за търсене")
+
+    # Зареждане на всички свързани данни наведнъж
+    aparat = query.options(
+        selectinload(Aparat.firm)
+        .selectinload(Org.dogovori)
+        .selectinload(Dogovor.svid)
+    ).first()
+
     if not aparat:
         raise HTTPException(status_code=404, detail="Апарат не е намерен.")
-
-    org = db.query(Org).filter(Org.id == aparat.norg).first()
-    if not org:
+    if not aparat.firm:
         raise HTTPException(status_code=404, detail="Фирмата не е намерена.")
 
-    dogovori = db.query(Dogovor).filter(Dogovor.kasa_no == aparat.kasa_no).all()
-    svidetelstva = db.query(Svid).filter(Svid.kasa_no == aparat.kasa_no).all()
+    org = aparat.firm
+    dogovori = org.dogovori
+    svidetelstva = []
+    for dogovor in dogovori:
+        svidetelstva.extend(dogovor.svid)
 
     return {
         "org": {
